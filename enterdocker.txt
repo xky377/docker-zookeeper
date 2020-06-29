@@ -1,0 +1,40 @@
+#使用Dockerfile创建镜像(zk为自己创建的镜像名称)
+docker build -t zk .
+
+
+#使用zk创建容器
+docker run -it --name zookeeper1 zk /bin/bash
+docker run -it --name zookeeper2 zk /bin/bash
+docker run -it --name zookeeper3 zk /bin/bash
+...
+
+
+#进入容器修改/usr/local/zookeeper/data/myid(每个容器均需要修改)
+zookeeper1 >> myid内容为1
+zookeeper2 >> myid内容为2
+zookeeper3 >> myid内容为3
+...
+
+
+#进入容器修改/usr/local/zookeeper/conf/zoo.cfg(每个容器均需要修改)
+#若在同一个容器则尽量不要用相同的端口(ip1:2888:3888,ip2:2889:3889...)
+echo >> server.1=zookeeper1IP:2888:3888
+echo >> server.2=zookeeper2IP:2888:3888
+echo >> server.3=zookeeper3IP:2888:3888
+...
+
+
+#启动zookeeper(每个容器均需要执行)
+cd /usr/local/zookeeper/bin
+./zkServer.sh start
+
+
+#查看状态
+cd /usr/local/zookeeper/bin
+./zkServer.sh status
+
+
+#停止zookeeper
+cd /usr/local/zookeeper/bin
+./zkServer.sh status
+
