@@ -1,0 +1,51 @@
+#基于openvswitch创建两个容器间的网络(点对点)
+
+
+#如果有多台机器，则每两台机器均需要设置  (不同的gre)
+#eg
+{
+#ubuntu1--ubuntu2(gre0)
+ovs-vsctl add-port obr0 gre0 --set interface gre0 type=gre options:remote_ip=<ip>
+#   ubuntu2--ubuntu3(gre1)
+ovs-vsctl add-port obr0 gre1 --set interface gre1 type=gre options:remote_ip=<ip>
+#   ubuntu1--ubuntu3(gre2)
+ovs-vsctl add-port obr0 gre2 --set interface gre2 type=gre options:remote_ip=<ip>
+}
+
+
+#创建ovs网桥
+ovs-vsctl add-br obr0
+
+
+#添加gre连接(<ip>为需要连接的其他宿主机ip)
+#其他主机ip:192.168.1.9  本机ip:192.168,1.4
+ovs-vsctl add-port obr0 gre0 --set interface gre0 type=gre options:remote_ip=<ip>
+
+
+#查看，此时应该有obr0网桥
+ovs-vsctl show
+
+
+#配置Docker容器虚拟网桥(ip为192.168.4.1,netmask为255.255.255.0)
+brctl addbr br0
+ifconfig br0 <ip> netmask <netmask>
+
+
+#为虚拟网桥添加ovs接口
+brctl addif br0 obr0
+
+#添加路由规则
+ip route add 192.168.9.0/24 via 192.168.1.9 dev wlp2s0
+
+
+#修改/etc/docker/daemon.json,添加
+"bridge":"br0"
+
+
+#重启docker 
+systemctl restart docker
+
+
+#查看路由规则
+ip route show
+
