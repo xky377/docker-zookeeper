@@ -1,4 +1,4 @@
-#如果只是基于一台机器搭建zookeeper集群，则只需要根据enterdocker.txt步骤进行
+#如果只是基于一台机器搭建zookeeper集群，只需要根据enterdocker.txt步骤进行即可
 
 
 #如果搭建基于docker的多宿主机的zookeeper集群，则需要先创建不同宿主机容器间的网络
